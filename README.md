@@ -1,11 +1,11 @@
-# [KLPBBS_auto_sign_in](https://github.com/xyz8848/KLPBBS_auto_sign_in)
+# [klpbbs-auto-sign-in](https://github.com/xyz8848/klpbbs-auto-sign-in)
 基于 GitHub Action 的苦力怕论坛自动签到脚本  
-[![GitHub Stars](https://img.shields.io/github/stars/GrandDuke1106/KLPBBS_auto_sign_in)](https://github.com/GrandDuke1106/KLPBBS_auto_sign_in/stargazers)
-[![GitHub Forks](https://img.shields.io/github/forks/GrandDuke1106/KLPBBS_auto_sign_in)](https://github.com/GrandDuke1106/KLPBBS_auto_sign_in/network/members)
+[![GitHub Stars](https://img.shields.io/github/stars/GrandDuke1106/klpbbs-auto-sign-in)](https://github.com/GrandDuke1106/klpbbs-auto-sign-in/stargazers)
+[![GitHub Forks](https://img.shields.io/github/forks/GrandDuke1106/klpbbs-auto-sign-in)](https://github.com/GrandDuke1106/klpbbs-auto-sign-in/network/members)
 
 ## 如何使用
 
-1. [Fork](https://github.com/GrandDuke1106/KLPBBS_auto_sign_in/fork) 这个仓库
+1. [Fork](https://github.com/GrandDuke1106/klpbbs-auto-sign-in/fork) 这个仓库
 2. 授予工作流读取和写入权限（用于工作流保活，如果仓库中在过去 60 天内没有提交，GitHub 将暂停 GitHub 工作流的计划触发器。除非进行新的提交，否则基于 cron 的触发器不会运行。）
 ![step2.webp](img/step2.webp)
 3. 打开 Actions secrets and variables  
