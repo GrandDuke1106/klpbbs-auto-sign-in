@@ -19,6 +19,7 @@ switch_user = int(os.environ.get("SWITCH_USER") or 0)
 renewal_vip = int(os.environ.get("RENEWAL_VIP") or 0)
 renewal_svip = int(os.environ.get("RENEWAL_SVIP") or 0)
 
+klpbbs_ip = os.environ.get("KLPBBS_IP", "43.248.96.249")
 debug = int(os.environ.get("DEBUG") or 0)
 
 mail_enable = int(os.environ.get("MAIL_ENABLE") or 0)
@@ -65,6 +66,15 @@ header = {
 session = requests.session()
 session.cookies = http.cookiejar.LWPCookieJar()
 
+if klpbbs_ip:
+    # 使用 IP 访问时需要的设置
+    base_url = f"https://{klpbbs_ip}"
+    header["Host"] = "klpbbs.com"  # 关键：设置 Host 头
+    session.verify = False  # 关闭 SSL 验证
+    logging.info(f"使用 IP 访问: {klpbbs_ip}")
+else:
+    base_url = "https://klpbbs.com"
+    logging.info("使用域名访问")
 
 def login(username: str, password: str):
     """
@@ -74,7 +84,7 @@ def login(username: str, password: str):
         username: 苦力怕论坛用户名
         password: 苦力怕论坛密码
     """
-    post_url = "https://klpbbs.com/member.php?mod=logging&action=login&loginsubmit=yes"
+    post_url = f"{base_url}/member.php?mod=logging&action=login&loginsubmit=yes"
     post_data = {
         "username": username,
         "password": password,
@@ -107,13 +117,13 @@ def get_url():
     Returns:
         签到链接 (sign_in_url)
     """
-    html_source = session.get("https://klpbbs.com/")
+    html_source = session.get(f"{base_url}/")
     logging.debug(html_source.text)
     soup = BeautifulSoup(html_source.text, "html.parser")
     a_tag = soup.find("a", class_="midaben_signpanel JD_sign")
     if a_tag is not None:
         href_value = a_tag["href"]
-        sign_in_url = "https://klpbbs.com/" + href_value
+        sign_in_url = f"{base_url}/{href_value}"
 
         logging.debug(f"签到链接：{sign_in_url}")
 
@@ -143,7 +153,7 @@ def is_sign_in():
     """
     检测是否签到成功
     """
-    html_source = session.get("https://klpbbs.com/")
+    html_source = session.get(f"{base_url}")
     logging.debug(f"https://klpbbs.com/ = {html_source.text}")
     soup = BeautifulSoup(html_source.text, "html.parser")
     a_tag = soup.find("a", class_="midaben_signpanel JD_sign visted")
@@ -162,14 +172,14 @@ def is_sign_in():
             ):
                 if switch_user == 1:
                     session.get(
-                        "https://klpbbs.com/home.php?mod=spacecp&ac=usergroup&do=switch&groupid=10&handlekey=switchgrouphk",
+                        f"{base_url}/home.php?mod=spacecp&ac=usergroup&do=switch&groupid=10&handlekey=switchgrouphk",
                         headers=header,
                     )
                     logging.info("已切换回普通用户组")
                     notice("已切换回普通用户组")
                 elif renewal_vip == 1:
                     session.get(
-                        "https://klpbbs.com/home.php?mod=spacecp&ac=usergroup&do=buy&groupid=21&inajax=1",
+                        f"{base_url}/home.php?mod=spacecp&ac=usergroup&do=buy&groupid=21&inajax=1",
                         headers=header,
                     )
                     logging.info("已续费VIP")
@@ -177,7 +187,7 @@ def is_sign_in():
                     os.execl(sys.executable, sys.executable, *sys.argv)
                 elif renewal_svip == 1:
                     session.get(
-                        "https://klpbbs.com/home.php?mod=spacecp&ac=usergroup&do=buy&groupid=22&inajax=1",
+                        f"{base_url}/home.php?mod=spacecp&ac=usergroup&do=buy&groupid=22&inajax=1",
                         headers=header,
                     )
                     logging.info("已续费SVIP")
