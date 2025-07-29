@@ -12,6 +12,9 @@ from http import cookiejar
 import requests
 from bs4 import BeautifulSoup
 
+import urllib3
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
 username = os.environ.get("USERNAME")
 password = os.environ.get("PASSWORD")
 
@@ -66,7 +69,7 @@ header = {
 session = requests.session()
 session.cookies = http.cookiejar.LWPCookieJar()
 
-if klpbbs_ip:
+if klpbbs_ip and klpbbs_ip != "":
     # 使用 IP 访问时需要的设置
     base_url = f"https://{klpbbs_ip}"
     header["Host"] = "klpbbs.com"  # 关键：设置 Host 头
@@ -117,7 +120,7 @@ def get_url():
     Returns:
         签到链接 (sign_in_url)
     """
-    html_source = session.get(f"{base_url}/")
+    html_source = session.get(f"{base_url}/", headers=header, verify=False)
     logging.debug(html_source.text)
     soup = BeautifulSoup(html_source.text, "html.parser")
     a_tag = soup.find("a", class_="midaben_signpanel JD_sign")
@@ -146,14 +149,14 @@ def sign_in(sign_in_url: str):
     Args:
         sign_in_url: 签到链接
     """
-    session.get(sign_in_url, headers=header)
+    session.get(sign_in_url, headers=header, verify=False)
 
 
 def is_sign_in():
     """
     检测是否签到成功
     """
-    html_source = session.get(f"{base_url}")
+    html_source = session.get(f"{base_url}/", headers=header, verify=False)
     logging.debug(f"https://klpbbs.com/ = {html_source.text}")
     soup = BeautifulSoup(html_source.text, "html.parser")
     a_tag = soup.find("a", class_="midaben_signpanel JD_sign visted")
@@ -174,6 +177,7 @@ def is_sign_in():
                     session.get(
                         f"{base_url}/home.php?mod=spacecp&ac=usergroup&do=switch&groupid=10&handlekey=switchgrouphk",
                         headers=header,
+                        verify=False,
                     )
                     logging.info("已切换回普通用户组")
                     notice("已切换回普通用户组")
@@ -181,6 +185,7 @@ def is_sign_in():
                     session.get(
                         f"{base_url}/home.php?mod=spacecp&ac=usergroup&do=buy&groupid=21&inajax=1",
                         headers=header,
+                        verify=False,
                     )
                     logging.info("已续费VIP")
                     notice("已续费VIP")
@@ -189,6 +194,7 @@ def is_sign_in():
                     session.get(
                         f"{base_url}/home.php?mod=spacecp&ac=usergroup&do=buy&groupid=22&inajax=1",
                         headers=header,
+                        verify=False,
                     )
                     logging.info("已续费SVIP")
                     notice("已续费SVIP")
@@ -301,10 +307,11 @@ def ntfy_notice(msg: str):
     Args:
         msg: 提示信息
     """
-    if not ntfy_username == "":
-        auth = requests.auth.HTTPBasicAuth(ntfy_username, ntfy_password)
-    if not ntfy_token == "":
+    auth = None
+    if ntfy_token:
         auth = requests.auth.HTTPBasicAuth("", ntfy_token)
+    elif ntfy_username and ntfy_password:
+        auth = requests.auth.HTTPBasicAuth(ntfy_username, ntfy_password)
     else:
         logging.error("ntfy 认证信息异常")
 
@@ -346,7 +353,7 @@ def normalize_domain(domain: str):
 if __name__ == "__main__":
     logging.debug(f"UserAgent: {userAgent}")
 
-    login(username, password)
+    login(f"gao66", f"R^8M!44KnUG!sMX4")
 
     url = get_url()
 
