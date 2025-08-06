@@ -353,7 +353,7 @@ def normalize_domain(domain: str):
 if __name__ == "__main__":
     logging.debug(f"UserAgent: {userAgent}")
 
-    login(f"gao66", f"R^8M!44KnUG!sMX4")
+    login(username, password)
 
     url = get_url()
 
